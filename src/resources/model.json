@@ -1,0 +1,63 @@
+    {
+        _config:{  
+            _host:"http://localhost:9200",
+            _indexes:{
+                    "vehicule":["voiture"]
+                },
+            
+            _request:{
+                class:"com.edifixio.amine.config.Mapping",
+                alias:{
+                    query:"query::filtered::query",
+                    voiture:"$$query::term::voiture"
+                },
+                mapping:{
+                    mainSearch:["$$voiture::value"]
+                        }
+            },
+            
+            
+            _meta_response:{
+                    class:"com.edifixio.amine.config.Mapping",
+                    alias:{tt:"lala"},
+                    mapping:{mainSearch:"$$voiture::value"}
+            },
+            _response:{
+                    class:"com.edifixio.amine.config.Mapping",
+                    mapping:{
+                        mainSearch:"value"
+                    }
+                }
+            ,
+            _facets:[ "test"]
+        },
+        
+        
+        _query:{
+             "query":  
+                {"filtered":{
+                    "query": {
+                        "term": {
+                            "voiture": {
+                                "value": "??"
+                            }
+                        }
+                    },
+                    "filter":{
+                 
+                        }
+                    }
+                }
+            
+        , "size": 40
+            
+        ,"aggs": {
+            "test": {
+                "terms": {
+                    "field": "cylendres",
+                    "size": 10
+                }
+            }
+        }
+    }
+}
