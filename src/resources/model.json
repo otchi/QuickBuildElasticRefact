@@ -25,7 +25,9 @@
             _response:{
                     class:"com.edifixio.amine.beans.ResponseBean",
                     mapping:{
-                       voitureName:"$$voiture"
+                       voitureName:"$$voiture",
+                        pays:"$$origine",
+                        year:"$$model"
                     }
                 }
             ,

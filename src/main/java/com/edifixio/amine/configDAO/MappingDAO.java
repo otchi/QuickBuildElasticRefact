@@ -33,7 +33,8 @@ public class MappingDAO extends ConfigDAO<Mapping> {
 
 	}
 
-	public static void main(String args[]) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+	public static void main(String args[]) throws JsonIOException, JsonSyntaxException, 
+																	FileNotFoundException {
 		JsonParser jsonParser = new JsonParser();
 		JsonObject jo = jsonParser
 				.parse(new FileReader(new File(
