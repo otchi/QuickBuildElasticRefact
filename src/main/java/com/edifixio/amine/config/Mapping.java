@@ -4,8 +4,8 @@ import java.util.Properties;
 
 public  class  Mapping{
 
-	private Class<?> BeanClass;
-	private Properties mapping;
+	protected Class<?> BeanClass;
+	protected Properties mapping;
 	
 	
 	
