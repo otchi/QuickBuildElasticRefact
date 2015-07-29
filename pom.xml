@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.edifixio.amine</groupId>
-	<artifactId>QuickBuildElastic_Refactoring1</artifactId>
+	<artifactId>QuickBuildElasticRefact</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>QuickBuildElastic_Refactoring1</name>
+	<name>QuickBuildElasticRefact</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -22,12 +22,12 @@
 	</repositories>
 
 	<dependencies>		
-		<dependency>
-			<groupId>com.edifixio</groupId>
-			<artifactId>jsonFastBuild</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 
+      <dependency>
+		<groupId>io.searchbox</groupId>
+		<artifactId>jest</artifactId>
+		<version>0.1.6</version>
+	</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

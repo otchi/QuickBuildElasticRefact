@@ -6,11 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -21,10 +20,6 @@ import com.edifixio.amine.config.MappingAlias;
 import com.edifixio.amine.configDAO.MainConfigDAO;
 import com.edifixio.amine.utiles.MyEntry;
 import com.edifixio.amine.utiles.Utiles;
-import com.edifixio.jsonFastBuild.ArrayBuilder.IBuildJsonArray;
-import com.edifixio.jsonFastBuild.ObjectBuilder.IPutProprety;
-import com.edifixio.jsonFastBuild.ObjectBuilder.IRootJsonBuilder;
-import com.edifixio.jsonFastBuild.ObjectBuilder.JsonObjectBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -39,61 +34,68 @@ import io.searchbox.core.Search;
 import io.searchbox.core.Search.Builder;
 
 public class Controller {
-	public static final String JSON_CONFIG_PATH = "/home/amine/workspace" + "/QuickBuildElasticRefact"
-			+ "/src/resources/model.json";
+	private String config ;
 	public static final String RESULT_SOURCE="hits::hits" ;
 	private MainConfig mainConfig;
 	private JsonObject query;
 	private JestClient jestClient;
 	private JestResult jestResult;
-	private Map<String,List<Entry<Entry<String,Number>, Boolean>>> facets;
+	private List<Facet> facets;
+	private Object request;
 
-	public Controller() throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-		init();
-	}
 
-	public Controller(Object request) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+	public Controller(String config) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		this.config=config;
 		init();
 	}
 	
-	public Controller(Object request,Map<String,List<Entry<Entry<String,Number>, Boolean>>> facets) throws JsonIOException, JsonSyntaxException, FileNotFoundException{
-		init();
+	
+	public void setRequest(Object request){
+		this.request=request;
+	}
+	
+	public void setFacets(List<Facet> facets){
 		this.facets=facets;
 	}
+
 	
 	
-	public void processFacetsRequest(){
+	public Entry<String,String> getAggTypeFiled(String name){
+		JsonObject queryFacet = Utiles.seletor("aggs::"+name, query).getAsJsonObject();
+		
+		Entry<String, JsonElement> agg=queryFacet.entrySet().iterator().next();
+		MyEntry< String, String> typeAgg=new MyEntry<String, String>(
+		agg.getKey(),
+		agg.getValue()
+			.getAsJsonObject().entrySet()
+			.iterator().next()
+			.getValue().getAsString());
+		
+		System.out.println(agg);
+		return typeAgg;
+	}
+	
+	
+	public void processFacetRequest(){
 		if(facets==null|| facets.size()==0)return;
-		Iterator<Entry<String,List<Entry<Entry<String,Number>, Boolean>>>> facetsIter=
-																	facets.entrySet().iterator();
+		Iterator<Facet> facetsIter=facets.iterator();
+		Facet facet;
 		while(facetsIter.hasNext()){
-			Entry<String,List<Entry<Entry<String,Number>, Boolean>>> entryfacet=facetsIter.next();
-			JsonElement queryFacet=Utiles.seletor("aggs::"+entryfacet.getKey(), query);
-			System.out.println("-----"+queryFacet);
-			String facetField=Utiles.seletor("terms::field", queryFacet).getAsString();
-			System.out.println(facetField);
-			Iterator<Entry<Entry<String,Number>, Boolean>> facetValueIter=entryfacet.getValue().iterator();
+			facet=facetsIter.next();
+			Entry<String,String> facetAggsType=getAggTypeFiled(facet.getName());
 			
-			IBuildJsonArray<IPutProprety<IPutProprety<IRootJsonBuilder>>> arraybuild=
-			JsonObjectBuilder.init().begin()
-								.putObject("terms")
-								.begin()
-									.putArray(facetField).begin();
-			while(facetValueIter.hasNext()){
-				Entry<Entry<String,Number>, Boolean> entryFacetValue=facetValueIter.next();
-				arraybuild.putValue(entryFacetValue.getKey().getKey());
-			}
-			query.add("post_filter", arraybuild.end().end().end().getJsonElement());
+			if(facetAggsType.getKey().equals("terms")) 
+				new TermsProcessFilter(query,facet.getCheckedTerms(),facetAggsType.getValue()).putFilter();
 			
-			System.out.println("%%%%%%%%%%"+query);
 		}
+		System.out.println("%%%%%%%%%%"+query);	
 	}
 
 	public void connection() {
 		jestClient=ElasticClient.getElasticClient(mainConfig.getHost()).getClient();
 	}
 
-	public void processRequest(Object request) throws NoSuchMethodException, SecurityException, IllegalAccessException,
+	public void processRequest() throws NoSuchMethodException, SecurityException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
 		MappingAlias reqMap = mainConfig.getRequestMapping();
 		if (reqMap.getBeanClass() != request.getClass())
@@ -128,6 +130,8 @@ public class Controller {
 		request.getClass().getMethods();
 	}
 	
+	
+	
 	public JestResult processJsonResult() throws IOException{
 		Properties indexes=mainConfig.getIndexes();
 		Iterator<Entry<Object, Object>> indexesIter=indexes.entrySet().iterator();
@@ -140,6 +144,8 @@ public class Controller {
 		}
 		return (this.jestResult=this.jestClient.execute(builder.build()));  
 	}
+	
+	
 	
 	public List<Object> processResultObjects() throws InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException{
 		Mapping responseMapping=mainConfig.getResponseMapping();
@@ -190,63 +196,69 @@ public class Controller {
 		return result;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Map<String,List<Entry<Entry<String,Number>, Boolean>>> processFirstFacetList(){
-		
-		List<String> conf=mainConfig.getFacets();
-		Iterator<String> confIter= conf.iterator();
-		Map<String,List<Entry<Entry<String,Number>, Boolean>>> result=
-				new HashMap<String, List<Entry<Entry<String,Number>,Boolean>>>();
-		
-		while(confIter.hasNext()){
-			
-			String facetName=confIter.next();
-			////////System.out.println(facetName);
-			JsonElement facetResult=Utiles.seletor("aggregations::"+facetName+"::buckets",jestResult.getJsonObject());
-		    ///////System.out.println(facetResult);
-		    Iterator<JsonElement> facetResultIter=facetResult.getAsJsonArray().iterator();
-			List<Entry<Entry<String,Number>, Boolean>> facetList=
-					new LinkedList<Map.Entry<Entry<String,Number>,Boolean>>();
-			while(facetResultIter.hasNext()){
-				JsonObject jso=facetResultIter.next().getAsJsonObject();
-				facetList.add(
-						new MyEntry(
-								new MyEntry<String, Number>(jso.get("key").getAsString(),
-										jso.get("doc_count").getAsNumber()),(Boolean) false));
-			}
-			
-			result.put(facetName,facetList);			
-		}
-		
-		return result;
-	} 
 	
-	public void init() throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-		JsonObject jo = new JsonParser().parse(new FileReader(new File(JSON_CONFIG_PATH))).getAsJsonObject();
+	public List<Facet> processFirstFacetList() {
+		List<String> conf;
+		List<Facet> result = new LinkedList<Facet>();
+		Facet facet;
+
+		if ((conf = mainConfig.getFacets()) == null)
+			return new ArrayList<Facet>();
+
+		Iterator<String> confIter = conf.iterator();
+
+		while (confIter.hasNext()) {
+			facet = new Facet();
+			String facetName = confIter.next();
+			facet.setName(facetName);
+			JsonElement facetResult = Utiles.seletor("aggregations::" + facetName + "::buckets",
+					jestResult.getJsonObject());
+	
+			Iterator<JsonElement> facetResultIter = facetResult.getAsJsonArray().iterator();
+
+			while (facetResultIter.hasNext()) {
+				JsonObject jso = facetResultIter.next().getAsJsonObject();
+				facet.add(new FacetUnite(jso.get("key").getAsString(), jso.get("doc_count").getAsInt(), false));
+
+			}
+			result.add(facet);
+		}
+		return result;
+	}
+	
+	
+	
+	public void init() throws  JsonSyntaxException, FileNotFoundException {
+		JsonObject jo = new JsonParser().parse(new FileReader(new File(config))).getAsJsonObject();
 		mainConfig = new MainConfigDAO(jo).getConfig();
 		this.query = jo.get("_query").getAsJsonObject();
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
 	public static void main(String args[])
 			throws JsonIOException, JsonSyntaxException, NoSuchMethodException,
 			SecurityException, IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, IOException, InstantiationException {
-		List<Entry<Entry<String,Number>, Boolean>> l=
-								new LinkedList<Map.Entry<Entry<String,Number>,Boolean>>();
-		HashMap<String, List<Entry<Entry<String,Number>, Boolean>>> h=
-								new HashMap<String, List<Entry<Entry<String,Number>,Boolean>>>();
-		l.add(new MyEntry(new MyEntry("5", 0), true));
-		h.put("test", l);
-		Controller c = new Controller(new RequestBean(),h);
-		c.processRequest(new RequestBean());
+		Facet l=new Facet();
+		List<Facet> h=new LinkedList<Facet>();
+		l.add(new FacetUnite("5", 0, true));
+		l.setName("test");
+		h.add(l);
+		Controller c = new Controller(	"/home/amine/workspace" 
+				+ "/QuickBuildElasticRefact"
+				+ "/src/resources/model.json");
+		c.setFacets(h);
+		c.setRequest(new RequestBean());
+		c.processRequest();
 		c.connection();
 		System.out.println(c.mainConfig.getRequestMapping());
 		System.out.println(c.query);
-		c.processFacetsRequest();
+		c.processFacetRequest();
 		System.out.println(c.processJsonResult().getJsonObject());
 		System.out.println(c.processResultObjects());
-		System.out.println(c.processFirstFacetList());
+		System.out.println("---"+c.processFirstFacetList());
+		System.out.println(c.getAggTypeFiled("test"));
+		
 	}
 
 }
