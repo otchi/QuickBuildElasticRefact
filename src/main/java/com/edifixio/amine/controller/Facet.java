@@ -1,8 +1,10 @@
 package com.edifixio.amine.controller;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public class Facet extends LinkedList<FacetUnite>{
@@ -15,6 +17,23 @@ public class Facet extends LinkedList<FacetUnite>{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	
+	public void facetProduice(Facet facet){
+		Map<String,FacetUnite> facetMap =new HashMap<String, FacetUnite>();
+		for(int i=0;i<facet.size();i++){
+			FacetUnite facetUnite=this.get(i);
+			facetMap.put(facetUnite.getTerm(),facetUnite);
+		}
+		
+		Iterator<FacetUnite> facetIter=facet.iterator();
+		
+		while(facetIter.hasNext()){
+			FacetUnite facetUnite=facetIter.next();
+			facetMap.get(facetUnite.getTerm()).setCount(facetUnite.getCount());
+		
+		}	
 	}
 	
 
@@ -30,11 +49,25 @@ public class Facet extends LinkedList<FacetUnite>{
     	while(facetIter.hasNext()){
     		FacetUnite facetUnite=facetIter.next();
     		if(facetUnite.getChecked()) 
-    			checkedTerm.add(facetUnite.getFacetUnit());
+    			checkedTerm.add(facetUnite.getTerm());
     	}
     	return checkedTerm;
   
     }
+  
+   public static void main(String args[]){
+	  Facet f= new Facet();
+	  f.setName("my");
+	  f.add(new FacetUnite("cc",5, false));
+	  f.add(new FacetUnite("dd", 1, true));
+	   
+	  Facet f1=new Facet();
+	  f1.add(new FacetUnite("cc", 7, true));
+	  f1.add(new FacetUnite("dd", 7, true));
+	  f.facetProduice(f1);
+	  System.out.println(f);
+	  
+   }
 
 
 }

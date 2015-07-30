@@ -8,8 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.edifixio.amine.beans.RequestBean;
-import com.edifixio.amine.beans.ResponseBean;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,7 +15,7 @@ import com.google.gson.JsonSyntaxException;
 
 
 public class QuickBuilder {
-	private BuildController buildController;
+	private IterateBuildController buildController;
 	
 	
 	public QuickBuilder(){
@@ -27,7 +25,7 @@ public class QuickBuilder {
 	public QuickBuilder(String requestPath){
 				try {
 					this.buildController=
-							new BuildController(
+							new IterateBuildController(
 									new JsonParser()
 									.parse(new FileReader(new File(requestPath)))
 									.getAsJsonObject());
@@ -44,7 +42,7 @@ public class QuickBuilder {
 	}
 	public QuickBuilder(JsonObject jsonObject){
 		try {
-			this.buildController=new BuildController(jsonObject);
+			this.buildController=new IterateBuildController(jsonObject);
 		} catch (JsonIOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,12 +65,12 @@ public class QuickBuilder {
 		
 		try {
 			
-			this.buildController.setFacets(facets);
+			
 			this.buildController.setRequest(requestBean);
 			this.buildController.connection();
 			this.buildController.processRequest();
-			this.buildController.processFacetRequest();
-			this.buildController.processJsonResult();
+			this.buildController.putFilterOfFacetsRequest();
+			this.buildController.execute();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -96,7 +94,7 @@ public class QuickBuilder {
 	
 	public List<Object> getResults(){
 		try {
-			return this.buildController.processResultObjects();
+			return this.buildController.processJsonToObjects();
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -121,14 +119,15 @@ public class QuickBuilder {
 	}
 	
 	public List<Facet> getNewFacet(){
-		return this.buildController.processFacetList();
+		//return this.buildController.processFacetList();
+		return null;
 	}
 
-	public BuildController getBuildController() {
+	public IterateBuildController getBuildController() {
 		return buildController;
 	}
 
-	public void setBuildController(BuildController buildController) {
+	public void setBuildController(IterateBuildController buildController) {
 		this.buildController = buildController;
 	}
 	

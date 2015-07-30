@@ -5,29 +5,29 @@ public  class FacetUnite {
 
 	private Integer count;
 	private Boolean checked;
-	private String facetUnit;
+	private String term;
 	
 	
 
-	public FacetUnite(String facetUnit,Integer count, Boolean checked) {
+	public FacetUnite(String term,Integer count, Boolean checked) {
 		super();
 		this.count = count;
 		this.checked = checked;
-		this.facetUnit = facetUnit;
+		this.term = term;
 	}
 
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "\n\t"+facetUnit+"||"+count+"||"+checked;
+		return "\n\t"+term+"||"+count+"||"+checked;
 	}
 
-	public String getFacetUnit() {
-		return facetUnit;
+	public String getTerm() {
+		return term;
 	}
 
-	public void setFacetUnit(String facetUnit) {
-		this.facetUnit = facetUnit;
+	public void setTerm(String term) {
+		this.term = term;
 	}
 
 	public Integer getCount() {

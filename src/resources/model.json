@@ -40,7 +40,7 @@
                     }
                 }
             ,
-            _facets:[ "test"]
+            _facets:[ "origine"]
         },
         
         
@@ -63,9 +63,9 @@
         , "size": 40
             
         ,"aggs": {
-            "test": {
+            "origine": {
                 "terms": {
-                    "field": "cylendres",
+                    "field": "origine",
                     "size": 10
                 }
             }
