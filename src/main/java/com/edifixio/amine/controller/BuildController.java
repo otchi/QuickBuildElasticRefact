@@ -33,8 +33,8 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.Search.Builder;
 
-public class Controller {
-	private String config ;
+public class BuildController {
+	
 	public static final String RESULT_SOURCE="hits::hits" ;
 	private MainConfig mainConfig;
 	private JsonObject query;
@@ -44,9 +44,12 @@ public class Controller {
 	private Object request;
 
 
-	public Controller(String config) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-		this.config=config;
-		init();
+	public BuildController(JsonObject jsonRequest) throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		mainConfig = new MainConfigDAO(jsonRequest).getConfig();
+		this.query =  jsonRequest.get("_query").getAsJsonObject();
+		
+	
+		
 	}
 	
 	
@@ -226,14 +229,11 @@ public class Controller {
 		return result;
 	}
 	
+	public List<Facet> processFacetList() {
 	
-	
-	public void init() throws  JsonSyntaxException, FileNotFoundException {
-		JsonObject jo = new JsonParser().parse(new FileReader(new File(config))).getAsJsonObject();
-		mainConfig = new MainConfigDAO(jo).getConfig();
-		this.query = jo.get("_query").getAsJsonObject();
+		return null;
 	}
-
+	
 
 	public static void main(String args[])
 			throws JsonIOException, JsonSyntaxException, NoSuchMethodException,
@@ -244,9 +244,11 @@ public class Controller {
 		l.add(new FacetUnite("5", 0, true));
 		l.setName("test");
 		h.add(l);
-		Controller c = new Controller(	"/home/amine/workspace" 
-				+ "/QuickBuildElasticRefact"
-				+ "/src/resources/model.json");
+		JsonObject jo = new JsonParser().parse(new FileReader(new File("/home/amine/workspaceHistory/workspace/"
+																		+ "QuickBuildElasticRefact/src/resources"
+																		+ "/model.json")))
+										.getAsJsonObject();
+		BuildController c = new BuildController(jo)	;
 		c.setFacets(h);
 		c.setRequest(new RequestBean());
 		c.processRequest();

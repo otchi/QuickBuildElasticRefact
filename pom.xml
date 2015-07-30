@@ -14,12 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>localrepository</id>
-			<url>file:///home/amine/Bureau/localRepository</url>
-		</repository>
-	</repositories>
+
 
 	<dependencies>		
 
