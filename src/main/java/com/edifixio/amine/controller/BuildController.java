@@ -158,7 +158,12 @@ public class BuildController {
 		Properties mapping=responseMapping.getMapping();
 		Iterator<Entry<Object, Object>> mappingIter=mapping.entrySet().iterator();
 		List<Object> result=new LinkedList<Object>();
-		
+		/*String[] s=source.toString().split("\"id\"");
+		System.out.println("--------------");
+		for(String str:s){
+			System.out.println(str+"\n");
+		}*/
+	
 		for(int i=0;i<source.size();i++)
 			result.add(responseMapping.getBeanClass().newInstance());
 		
@@ -172,6 +177,7 @@ public class BuildController {
 			
 			if(sourceIter.hasNext()){
 				JsonObject jo=sourceIter.next().getAsJsonObject();
+
 				JsonElement sourceValue=Utiles.seletor(selector, jo);
 				Class<?> c=null;
 				JsonPrimitive jop=sourceValue.getAsJsonPrimitive();
@@ -181,8 +187,15 @@ public class BuildController {
 				
 				Method method=responseMapping.getBeanClass().getMethod(methodeName, c);
 				int i=0;
+				if(c==String.class)
+					method.invoke(result.get(i++),sourceValue.getAsString());	
+				if(c==Number.class)
+					method.invoke(result.get(i++),sourceValue.getAsNumber());
+				if(c==Boolean.class)
+					method.invoke(result.get(i++),sourceValue.getAsBoolean());
 				while(sourceIter.hasNext()){
 					 jo=sourceIter.next().getAsJsonObject();
+					 
 					 sourceValue=Utiles.seletor(selector, jo);
 					//System.out.println(result.get(i++));
 					//System.out.println(sourceValue);
@@ -195,7 +208,6 @@ public class BuildController {
 				}
 			}
 		}
-		
 		return result;
 	}
 	
@@ -255,11 +267,12 @@ public class BuildController {
 		c.connection();
 		System.out.println(c.mainConfig.getRequestMapping());
 		System.out.println(c.query);
-		c.processFacetRequest();
+		//c.processFacetRequest();
 		System.out.println(c.processJsonResult().getJsonObject());
-		System.out.println(c.processResultObjects());
+		System.out.println("+++"+c.processResultObjects());
 		System.out.println("---"+c.processFirstFacetList());
 		System.out.println(c.getAggTypeFiled("test"));
+		
 		
 	}
 

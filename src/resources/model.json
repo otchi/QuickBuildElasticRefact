@@ -25,9 +25,18 @@
             _response:{
                     class:"com.edifixio.amine.beans.ResponseBean",
                     mapping:{
-                       voitureName:"$$voiture",
-                        pays:"$$origine",
-                        year:"$$model"
+                        id:"$$id",
+                        voiture:"$$voiture",
+                        MPG:"$$MPG",
+                        cylendres:"$$cylendres",
+                        vitesseMax:"$$vitesseMax",
+                        nbrChauveaux:"$$nbrChauveaux",
+                        poid:"$$poid",
+                        acceleration:"$$acceleration",
+                        model:"$$model",
+                        origine:"$$origine"
+                        
+                        
                     }
                 }
             ,

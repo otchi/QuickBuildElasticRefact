@@ -133,7 +133,7 @@ public class QuickBuilder {
 	}
 	
 	
-	public static void main(String[] args){
+/*	public static void main(String[] args){
 		
 		QuickBuilder quickBuilder=new QuickBuilder("/home/amine/workspaceHistory/workspace/"
 				+ "QuickBuildElasticRefact/src/resources"
@@ -143,9 +143,9 @@ public class QuickBuilder {
 		System.out.println(objs.size());
 		for(Object obj:objs){
 			ResponseBean r=(ResponseBean)obj;
-			System.out.println(r.getVoitureName());
+			//System.out.println(r.getVoitureName());
 		}
-	}
+	}*/
 	
 
 }
