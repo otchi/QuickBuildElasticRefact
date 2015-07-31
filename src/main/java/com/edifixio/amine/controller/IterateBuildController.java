@@ -92,7 +92,7 @@ public class IterateBuildController extends BuildController{
 					.size()
 			!= 0)
 			this.query.add("post_filter", postFilterObject);
-		System.out.println("%%%%%%%%%%"+query);	
+		//System.out.println("%%%%%%%%%%"+query);	
 	}
 
 
@@ -189,9 +189,9 @@ public class IterateBuildController extends BuildController{
 		
 		ibc.connection();
 		ibc.processRequest();
-		initFacet.get(0).get(0).setChecked(false);
-		initFacet.get(0).get(1).setChecked(true);
-		initFacet.get(0).get(2).setChecked(true);
+		initFacet.get(0).getTerms().get(0).setChecked(false);
+		initFacet.get(0).getTerms().get(1).setChecked(true);
+		initFacet.get(0).getTerms().get(2).setChecked(true);
 		ibc.putFilterOfFacetsRequest(initFacet);
 		ibc.execute();
 		System.out.println("+++++---"+initFacet);

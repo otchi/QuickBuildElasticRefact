@@ -40,7 +40,7 @@
                     }
                 }
             ,
-            _facets:[ "origine"]
+            _facets:[ "origine","cylendres"]
         },
         
         
@@ -68,7 +68,12 @@
                     "field": "origine",
                     "size": 10
                 }
-            }
+            },"cylendres":{
+              "terms": {
+                "field": "cylendres",
+                "size": 10
+              }
         }
     }
-}
+    
+}}

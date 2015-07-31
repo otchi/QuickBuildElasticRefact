@@ -1,7 +1,7 @@
 package com.edifixio.amine.beans;
 
 public class RequestBean {
-	private String mainSearch="audi";
+	private String mainSearch;
 
 	public String getMainSearch() {
 		return mainSearch;
@@ -10,5 +10,6 @@ public class RequestBean {
 	public void setMainSearch(String mainSearch) {
 		this.mainSearch = mainSearch;
 	}
+
 
 }

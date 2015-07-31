@@ -60,7 +60,7 @@ public abstract  class BuildController {
 
 		while (indexesIter.hasNext()) {
 			Entry<Object, Object> entry = indexesIter.next();
-			System.out.println(entry.getKey());
+		//	System.out.println(entry.getKey());
 			builder.addIndex((String) entry.getKey());
 		}
 		this.jestResult = this.jestClient.execute(builder.build());
@@ -145,14 +145,12 @@ public abstract  class BuildController {
 			facet = new Facet();
 			String facetName = confIter.next();
 			facet.setName(facetName);
-			JsonElement facetResult = Utiles.seletor("aggregations::" + facetName + "::buckets",
-					jestResult.getJsonObject());
-
+			JsonElement facetResult = Utiles.seletor("aggregations::" + facetName + "::buckets",jestResult.getJsonObject());
 			Iterator<JsonElement> facetResultIter = facetResult.getAsJsonArray().iterator();
 
 			while (facetResultIter.hasNext()) {
 				JsonObject jso = facetResultIter.next().getAsJsonObject();
-				facet.add(new FacetUnite(jso.get("key").getAsString(), jso.get("doc_count").getAsInt(), true));
+				facet.getTerms().add(new FacetUnite(jso.get("key").getAsString(), jso.get("doc_count").getAsInt(), true));
 
 			}
 			result.add(facet);
