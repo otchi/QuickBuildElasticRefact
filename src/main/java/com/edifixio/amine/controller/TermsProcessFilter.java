@@ -3,6 +3,7 @@ package com.edifixio.amine.controller;
 import java.util.Iterator;
 import java.util.List;
 
+import com.edifixio.amine.utiles.Utiles;
 import com.edifixio.jsonFastBuild.ArrayBuilder.IBuildJsonArray;
 import com.edifixio.jsonFastBuild.ObjectBuilder.IPutProprety;
 import com.edifixio.jsonFastBuild.ObjectBuilder.IRootJsonBuilder;
@@ -28,7 +29,7 @@ public class TermsProcessFilter implements IProcessFilter{
 	}
 		
 	
-	public void putFilter() {
+	public JsonObject putFilter() {
 		// TODO Auto-generated method stub
 		IBuildJsonArray<IPutProprety<IPutProprety<IRootJsonBuilder>>> arrayField=
 		JsonObjectBuilder.init()
@@ -42,11 +43,23 @@ public class TermsProcessFilter implements IProcessFilter{
 		while(terms.hasNext()){
 			arrayField.putValue(terms.next());
 		}
-		query.add("post_filter", arrayField.end().end().end().getJsonElement());
-									
+		
+		JsonObject jso=arrayField.end().end().end().getJsonElement().getAsJsonObject();
+		
+		return 
+				(Utiles
+						.seletor("term::"+field, jso)
+						.getAsJsonArray().size()!=0)			?
 								
-		
-		
+								(arrayField.end()
+										.end()
+									.end()
+								.getJsonElement()
+								.getAsJsonObject())					
+								
+																:	
+								null;
+								
 	}
 
 }

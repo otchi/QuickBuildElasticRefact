@@ -17,13 +17,15 @@ import com.edifixio.amine.beans.RequestBean;
 import com.edifixio.amine.config.MappingAlias;
 import com.edifixio.amine.utiles.MyEntry;
 import com.edifixio.amine.utiles.Utiles;
+import com.edifixio.jsonFastBuild.ObjectBuilder.JsonObjectBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-public class IterateBuildController extends FirstBuildController{
+public class IterateBuildController extends BuildController{
 	
 
 	
@@ -58,18 +60,38 @@ public class IterateBuildController extends FirstBuildController{
 	}
 	
 
-	public void putFilterOfFacetsRequest(){
+	public void putFilterOfFacetsRequest(List<Facet> facets){
 		if(facets==null|| facets.size()==0)return;
+		
+		JsonObject postFilterObject=
+				JsonObjectBuilder.init()
+							.begin()
+								.putObject("bool")
+								.begin()
+									.putEmptyArray("must")
+								.end()
+							.end()
+						.getJsonElement()
+						.getAsJsonObject();
+		JsonArray must=Utiles.seletor("bool::must",postFilterObject).getAsJsonArray();
+		System.out.println(must.size());
 		Iterator<Facet> facetsIter=facets.iterator();
 		Facet facet;
 		while(facetsIter.hasNext()){
 			facet=facetsIter.next();
 			Entry<String,String> facetAggsType=getAggTypeFiled(facet.getName());
-			
-			if(facetAggsType.getKey().equals("terms")) 
-				new TermsProcessFilter(query,facet.getCheckedTerms(),facetAggsType.getValue()).putFilter();
-			
+			JsonObject filter;
+			if(facetAggsType.getKey().equals("terms")) {
+				filter=new TermsProcessFilter(query,facet.getCheckedTerms(),facetAggsType.getValue()).putFilter();
+				if(filter!=null)
+					must.add(new TermsProcessFilter(query,facet.getCheckedTerms(),facetAggsType.getValue()).putFilter());
+			}
 		}
+		if(Utiles.seletor("bool::must",postFilterObject)
+					.getAsJsonArray()
+					.size()
+			!= 0)
+			this.query.add("post_filter", postFilterObject);
 		System.out.println("%%%%%%%%%%"+query);	
 	}
 
@@ -112,23 +134,24 @@ public class IterateBuildController extends FirstBuildController{
 	
 
 	
-	public List<Facet> processFacetList(List<Facet> facets) {
+	public List<Facet> getFacetList(List<Facet>  facets) {
+		// TODO Auto-generated method stub
+		super.processFacetList();
 		Map<String,Facet> facetsMap=new HashMap<String, Facet>();
 		
-		for(int i=0;i<this.facets.size();i++){
+		for(int i=0;i<facets.size();i++){
 			Facet facet=facets.get(i);
 			facetsMap.put(facet.getName(), facet);
 		}
-	
 		Iterator<Facet> facetsIter=this.facets.iterator();
 		while(facetsIter.hasNext()){
 			Facet facet=facetsIter.next();
 			facetsMap.get(facet.getName()).facetProduice(facet);
 		}
-	
 		return facets;
 	}
 	
+
 
 	public static void main(String args[]) throws JsonIOException, JsonSyntaxException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException  {
 	
@@ -140,10 +163,11 @@ public class IterateBuildController extends FirstBuildController{
 		System.out.println(fbc.query);
 		fbc.connection();
 		System.out.println(fbc.jestClient);
-		System.out.println(fbc.execute().jestResult.getJsonString());
+		fbc.execute();
+		System.out.println(fbc.jestResult.getJsonString());
 		List<Facet> initFacet;
 		fbc.processFacetList();
-		System.out.println(initFacet=fbc.facets);
+		System.out.println("++"+(initFacet=fbc.facets));
 		System.out.println(fbc.processJsonToObjects().toString());	
 		
 		
@@ -160,14 +184,26 @@ public class IterateBuildController extends FirstBuildController{
 		
 		
 		
-		System.out.println(ibc.request);
+		System.out.println(((RequestBean)ibc.request).getMainSearch());
+		System.out.println("--"+ibc.query);
+		
+		ibc.connection();
+		ibc.processRequest();
+		initFacet.get(0).get(0).setChecked(false);
+		initFacet.get(0).get(1).setChecked(true);
+		initFacet.get(0).get(2).setChecked(true);
+		ibc.putFilterOfFacetsRequest(initFacet);
+		ibc.execute();
+		System.out.println("+++++---"+initFacet);
 		System.out.println(ibc.query);
-		
-		
-		
+		System.out.println(ibc.jestResult.getJsonString());
+		System.out.println(ibc.processJsonToObjects());
+		System.out.println(ibc.getFacetList(initFacet));
 	
 		
 		
 	}
+
+
 
 }

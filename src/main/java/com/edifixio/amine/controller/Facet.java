@@ -21,9 +21,11 @@ public class Facet extends LinkedList<FacetUnite>{
 	
 	
 	public void facetProduice(Facet facet){
+	
 		Map<String,FacetUnite> facetMap =new HashMap<String, FacetUnite>();
-		for(int i=0;i<facet.size();i++){
+		for(int i=0;i<this.size();i++){
 			FacetUnite facetUnite=this.get(i);
+			facetUnite.setCount(0);
 			facetMap.put(facetUnite.getTerm(),facetUnite);
 		}
 		
@@ -32,7 +34,6 @@ public class Facet extends LinkedList<FacetUnite>{
 		while(facetIter.hasNext()){
 			FacetUnite facetUnite=facetIter.next();
 			facetMap.get(facetUnite.getTerm()).setCount(facetUnite.getCount());
-		
 		}	
 	}
 	
