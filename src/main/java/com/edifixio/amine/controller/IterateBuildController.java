@@ -15,6 +15,7 @@ import java.util.Properties;
 
 import com.edifixio.amine.beans.RequestBean;
 import com.edifixio.amine.config.MappingAlias;
+import com.edifixio.amine.facets.Facet;
 import com.edifixio.amine.utiles.MyEntry;
 import com.edifixio.amine.utiles.Utiles;
 import com.edifixio.jsonFastBuild.ObjectBuilder.JsonObjectBuilder;
@@ -45,6 +46,8 @@ public class IterateBuildController extends BuildController{
 	
 /***************************** recupere the name and the field agreged********************************************/	
 	public Entry<String,String> getAggTypeFiled(String name){
+		System.out.println(query+"//\n"+name);
+		System.out.println(Utiles.seletor("aggs::",query));
 		JsonObject queryFacet = Utiles.seletor("aggs::"+name, query).getAsJsonObject();
 		
 		Entry<String, JsonElement> agg=queryFacet.entrySet().iterator().next();
@@ -156,7 +159,7 @@ public class IterateBuildController extends BuildController{
 	public static void main(String args[]) throws JsonIOException, JsonSyntaxException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException  {
 	
 		
-		JsonObject fjo = new JsonParser().parse(new FileReader(new File("/home/amine/Bureau/confQuery/Voiture/query.json")))
+		JsonObject fjo = new JsonParser().parse(new FileReader(new File("/home/amine/Bureau/confQuery/Voiture/matchall.json")))
 				.getAsJsonObject();
 		FirstBuildController fbc=new FirstBuildController(fjo);
 	
@@ -174,13 +177,13 @@ public class IterateBuildController extends BuildController{
 		
 		
 	/*********************** inject request in the second request ************************************************************/	
-		JsonObject jo = new JsonParser().parse(new FileReader(new File("/home/amine/workspaceHistory/workspace/"
-				+ "QuickBuildElasticRefact/src/resources"
-				+ "/model.json")))
+		JsonObject jo = new JsonParser().parse(new FileReader(new File("/home/amine/Bureau/confQuery/Voiture/query.json")))
 				.getAsJsonObject();
 		
 		IterateBuildController ibc = new IterateBuildController(jo);
-		ibc.setRequest(new RequestBean());
+		RequestBean rb=new RequestBean();
+		rb.setMainSearch("audi");
+		ibc.setRequest(rb);
 		
 		
 		
@@ -189,6 +192,7 @@ public class IterateBuildController extends BuildController{
 		
 		ibc.connection();
 		ibc.processRequest();
+		System.out.println(ibc.query);
 		initFacet.get(0).getTerms().get(0).setChecked(false);
 		initFacet.get(0).getTerms().get(1).setChecked(true);
 		initFacet.get(0).getTerms().get(2).setChecked(true);
@@ -197,11 +201,9 @@ public class IterateBuildController extends BuildController{
 		System.out.println("+++++---"+initFacet);
 		System.out.println(ibc.query);
 		System.out.println(ibc.jestResult.getJsonString());
-		System.out.println(ibc.processJsonToObjects());
+		System.out.println("++++"+ibc.processJsonToObjects().size());
 		System.out.println(ibc.getFacetList(initFacet));
 	
-		
-		
 	}
 
 

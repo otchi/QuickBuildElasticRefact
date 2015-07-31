@@ -103,6 +103,12 @@ public class JsonObjectBuilder<ParentType> implements IBuildJsonObject<ParentTyp
 		 this.putPreprety(proprety).putObject();
 		 return this;
 	}
+	
+	public IPutProprety<ParentType> putJsonElement(String name, JsonElement jsonElement) {
+		// TODO Auto-generated method stub
+		this.jsonObject.add(name, jsonElement);
+		return this;
+	}
 	public IPutProprety<ParentType> putPreprety(String proprety, String value) {
 		// TODO Auto-generated method stub
 		return this.putPreprety(proprety).putValue(value);
@@ -129,9 +135,4 @@ public class JsonObjectBuilder<ParentType> implements IBuildJsonObject<ParentTyp
 		 this.putPreprety(proprety).putArray();
 		 return this;
 	}
-	
-	
-	
-
-
 }

@@ -1,4 +1,4 @@
-package com.edifixio.amine.controller;
+package com.edifixio.amine.utiles;
 
 import java.util.Hashtable;
 

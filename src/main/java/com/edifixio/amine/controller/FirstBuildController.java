@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import com.edifixio.amine.facets.Facet;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -44,7 +45,7 @@ public  class FirstBuildController extends BuildController {
 			throws JsonIOException, JsonSyntaxException, IOException, InstantiationException, IllegalAccessException,
 			NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
 		JsonObject jo = new JsonParser()
-				.parse(new FileReader(new File("/home/amine/Bureau/confQuery/Voiture/query.json"))).getAsJsonObject();
+				.parse(new FileReader(new File("/home/amine/Bureau/confQuery/Voiture/matchall.json"))).getAsJsonObject();
 		System.out.println(jo);
 		FirstBuildController f = new FirstBuildController(jo);
 		System.out.println(f.query);

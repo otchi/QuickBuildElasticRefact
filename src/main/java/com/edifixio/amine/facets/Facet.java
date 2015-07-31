@@ -1,4 +1,4 @@
-package com.edifixio.amine.controller;
+package com.edifixio.amine.facets;
 
 import java.util.HashMap;
 import java.util.Iterator;

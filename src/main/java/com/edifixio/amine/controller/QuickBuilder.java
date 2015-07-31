@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.edifixio.amine.beans.RequestBean;
+import com.edifixio.amine.facets.Facet;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -104,7 +105,9 @@ public class QuickBuilder implements IQuickBuilder{
 				+ "QuickBuildElasticRefact/src/resources"
 				+ "/model.json", new RequestBean(), factes);
 		System.out.println(quickBuilder.getResponse());
-		System.out.println(quickBuilder.getFacets());
+		System.out.println(quickBuilder	);
+		
+		//System.out.println(quickBuilder.getFacets());
 	}
 
 }

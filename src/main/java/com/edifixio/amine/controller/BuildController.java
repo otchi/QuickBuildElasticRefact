@@ -14,6 +14,9 @@ import java.util.Map.Entry;
 import com.edifixio.amine.config.MainConfig;
 import com.edifixio.amine.config.Mapping;
 import com.edifixio.amine.configDAO.MainConfigDAO;
+import com.edifixio.amine.facets.Facet;
+import com.edifixio.amine.facets.FacetUnite;
+import com.edifixio.amine.utiles.ElasticClient;
 import com.edifixio.amine.utiles.Utiles;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -74,6 +77,7 @@ public abstract  class BuildController {
 	public List<Object> processJsonToObjects() throws InstantiationException, IllegalAccessException,
 			NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
 		Mapping responseMapping = mainConfig.getResponseMapping();
+
 		JsonArray source = Utiles.seletor(RESULT_SOURCE, jestResult.getJsonObject()).getAsJsonArray();
 		////// System.out.println(responseMapping.getBeanClass());
 		/////// System.out.println(source);

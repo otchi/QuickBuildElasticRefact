@@ -84,6 +84,12 @@ public class JsonArrayBuilder<ParentType>
 		this.putObject();
 		return this;
 	}
+	
+	public IBuildJsonArray<ParentType> putJsonElement(JsonElement jsonElement) {
+		// TODO Auto-generated method stub
+		this.jsonArray.add(jsonElement);
+		return this;
+	}
 
 	public IBuildJsonArray<ParentType> putValue(String value) {
 		// TODO Auto-generated method stub
@@ -108,6 +114,8 @@ public class JsonArrayBuilder<ParentType>
 		this.jsonArray.add(new JsonParser().parse(value.toString()));
 		return this;
 	}
+
+	
 
 
 
